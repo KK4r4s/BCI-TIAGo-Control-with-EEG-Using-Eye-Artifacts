@@ -1,0 +1,4 @@
+geometry_msgs/PoseStamped object_pose
+---
+string result
+bool grasp

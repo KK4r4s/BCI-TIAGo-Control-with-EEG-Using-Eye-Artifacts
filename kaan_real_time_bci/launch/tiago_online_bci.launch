@@ -1,0 +1,40 @@
+<launch>	
+  <arg name = "rviz" default = "true" />
+  <!-- Load definition of pregrasp motion into play_motion namespace -->
+  <rosparam command = "load" file = "$(find tiago_pick_demo)/config/pick_motions.yaml" /> 
+  <!--<rosparam command = "load" file = "$(find pick_and_place)/motions/pass_right.yaml" />-->
+  
+  <node pkg = "topic_tools" type = "throttle" name = "throttle_depth" args = "messages /xtion/depth_registered/points 2  /throttle_filtering_points/filtered_points" />
+
+  <group>
+    <!-- Specify the geometrical features of the object to grasp-->
+    <arg name="object_width"  value="0.07" />
+    <arg name="object_height" value="0.20" />
+    <arg name="object_depth"  value="0.07" />
+    
+    <!-- Pick & place server -->
+    <node name="pick_and_place_server" pkg="tiago_pick_demo" type="pick_and_place_server.py" output="screen">
+      <rosparam command="load" file="$(find tiago_pick_demo)/config/pick_and_place_params.yaml" />
+      <param name="object_width"  value="$(arg object_width)" />
+      <param name="object_height" value="$(arg object_height)" />
+      <param name="object_depth"  value="$(arg object_depth)" />
+    </node>
+
+    <!-- Launch the nodes of the pick and place stack -->
+  <node pkg = "kaan_real_time_bci" type = "pick_server.py" name = "pick_server" output = "screen" />
+    <node pkg = "kaan_real_time_bci" type = "scan_server.py" name = "scan_server" output = "screen" />
+    <node pkg = "kaan_real_time_bci" type = "choose_task_pick_and_place.py" name = "choose_task_pick_and_place" output = "screen" />
+    <node pkg="kaan_real_time_bci" type="choose_task_dance.py" name="choose_task_dance" output="screen"/>
+    <node pkg="kaan_real_time_bci" type="choose_task_go_to_table.py" name="choose_task_go_to_table" output="screen"/>
+    <node pkg="kaan_real_time_bci" type="choose_task_nurse.py" name="choose_task_nurse" output="screen"/>
+    <node pkg="kaan_real_time_bci" type="control_base_movements.py" name="control_base_movements" output="screen"/>
+    <!-- <node pkg="kaan_real_time_bci" type="socket_distributer.py" name="socket_distributer" output="screen"/> -->	
+  </group>
+
+  <!-- If required, launch Rviz to visualize the planning scene -->
+  <group if="$(arg rviz)">
+    <node name="pick_demo_rviz" pkg="rviz" type="rviz" args="-d $(find tiago_pick_demo)/config/rviz/tiago_pick_demo.rviz" />
+  </group>
+
+</launch>
+	

@@ -1,0 +1,3 @@
+---
+sensor_msgs/PointCloud2[] objects_cloud
+sensor_msgs/PointCloud2 plane_cloud
